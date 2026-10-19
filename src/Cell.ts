@@ -1,32 +1,38 @@
+export type CellContent = "empty" | "obstacle";
+
 // Une cellule est soit vide, soit un obstacle.
 // Les joueurs et les armes qui se trouvent dessus sont gérés par GameMap.
-class Cell {
-    static EMPTY = "empty";
-    static OBSTACLE = "obstacle";
+export class Cell {
+    static readonly EMPTY: CellContent = "empty";
+    static readonly OBSTACLE: CellContent = "obstacle";
 
-    constructor(x, y, content = Cell.EMPTY) {
+    private readonly _x: number;
+    private readonly _y: number;
+    private readonly _content: CellContent;
+
+    constructor(x: number, y: number, content: CellContent = Cell.EMPTY) {
         this._x = x;
         this._y = y;
         this._content = content;
     }
 
-    get x() {
+    get x(): number {
         return this._x;
     }
 
-    get y() {
+    get y(): number {
         return this._y;
     }
 
-    get content() {
+    get content(): CellContent {
         return this._content;
     }
 
-    get isObstacle() {
+    get isObstacle(): boolean {
         return this._content === Cell.OBSTACLE;
     }
 
-    get isEmpty() {
+    get isEmpty(): boolean {
         return this._content === Cell.EMPTY;
     }
 }

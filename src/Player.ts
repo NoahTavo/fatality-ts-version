@@ -1,5 +1,22 @@
-class Player {
-    constructor(file, x = null, y = null) {
+import { PLAYER_MAX_HP, POSTURES, type Posture } from "./config/constants";
+import { DEFAULT_WEAPON } from "./config/Weapons";
+import type { Position } from "./types";
+import type { Weapon } from "./Weapon";
+
+// Position d'un joueur qui n'a pas encore été posé sur la carte.
+const NOT_PLACED = -1;
+
+export class Player {
+    private readonly _file: string;
+    private readonly _name: string;
+    private readonly _path: string;
+    private _x: number;
+    private _y: number;
+    private _hp: number;
+    private _weapon: Weapon;
+    private _posture: Posture;
+
+    constructor(file: string, x: number = NOT_PLACED, y: number = NOT_PLACED) {
         this._file = file;
         this._name = file.replace(/\.png$/i, "");
         this._path = `assets/characters/${file}`;
@@ -10,223 +27,72 @@ class Player {
         this._posture = POSTURES.OFFENSIVE;
     }
 
-    get file() {
+    get file(): string {
         return this._file;
     }
 
-    get name() {
+    get name(): string {
         return this._name;
     }
 
-    get path() {
+    get path(): string {
         return this._path;
     }
 
-    get x() {
+    get x(): number {
         return this._x;
     }
 
-    get y() {
+    get y(): number {
         return this._y;
     }
 
-    get position() {
+    get position(): Position {
         return { x: this.x, y: this.y };
     }
 
-    set position({ x, y }) {
+    set position({ x, y }: Position) {
         this._x = x;
         this._y = y;
     }
 
-    get hp() {
+    get hp(): number {
         return this._hp;
     }
 
     // Les PV restent toujours entre 0 et PLAYER_MAX_HP.
-    set hp(value) {
+    set hp(value: number) {
         this._hp = Math.max(0, Math.min(PLAYER_MAX_HP, value));
     }
 
-    get isAlive() {
+    get isAlive(): boolean {
         return this.hp > 0;
     }
 
-    get weapon() {
+    get weapon(): Weapon {
         return this._weapon;
     }
 
-    set weapon(value) {
+    set weapon(value: Weapon) {
         this._weapon = value;
     }
 
-    get posture() {
+    get posture(): Posture {
         return this._posture;
     }
 
-    set posture(value) {
+    set posture(value: Posture) {
         this._posture = value;
     }
 
-    takeDamage(damage) {
+    takeDamage(damage: number): void {
         this.hp -= damage;
     }
 
     // Posture défensive : -50 % de dégâts subis au prochain tour.
-    togglePosture() {
+    togglePosture(): void {
         this.posture = this.posture === POSTURES.OFFENSIVE
             ? POSTURES.DEFENSIVE
             : POSTURES.OFFENSIVE;
     }
 }
-
-// ---------------------------------------------------------------------------
-// Menu : sélection des personnages (fatality.html)
-// ---------------------------------------------------------------------------
-class PlayerSelector {
-    constructor(selectId, previewId, players) {
-        this._select = document.getElementById(selectId);
-        this._preview = document.getElementById(previewId);
-        this._players = players;
-        this.initialize();
-    }
-
-    get select() {
-        return this._select;
-    }
-
-    get preview() {
-        return this._preview;
-    }
-
-    get players() {
-        return this._players;
-    }
-
-    initialize() {
-        // Absent sur les pages sans sélecteur de personnage (index.html).
-        if (!this.select || !this.preview) {
-            return;
-        }
-
-        this.populateSelect();
-        this.listenToSelectionChange();
-    }
-
-    populateSelect() {
-        this.select.replaceChildren();
-
-        this.players.forEach(player => {
-            const option = document.createElement("option");
-            option.value = player.file;
-            option.textContent = player.name;
-            this.select.appendChild(option);
-        });
-    }
-
-    // Met à jour l'aperçu à chaque changement de personnage dans la liste.
-    listenToSelectionChange() {
-        this.select.addEventListener("change", () => this.updatePreview());
-    }
-
-    updatePreview() {
-        const player = this.players.find(item => item.file === this.select.value);
-
-        if (!player) {
-            this.preview.removeAttribute("src");
-            this.preview.removeAttribute("alt");
-            return;
-        }
-
-        this.preview.src = player.path;
-        this.preview.alt = player.name;
-    }
-}
-
-class PlayerManager {
-    constructor() {
-        this._players = PLAYER_FILES.map(file => new Player(file));
-    }
-
-    get players() {
-        return this._players;
-    }
-
-    findPlayer(file) {
-        return this.players.find(player => player.file === file);
-    }
-
-    // Joueurs choisis dans le menu (joueur 1 puis joueur 2).
-    // Nouvelle instance à chaque fois : les deux joueurs peuvent avoir le même personnage.
-    get selectedPlayers() {
-        return [PLAYER1_STORAGE_KEY, PLAYER2_STORAGE_KEY]
-            .map(key => localStorage.getItem(key))
-            .filter(file => this.findPlayer(file))
-            .map(file => new Player(file));
-    }
-}
-
-class FatalityMenu {
-    constructor() {
-        this._playerManager = new PlayerManager();
-        this.createSelectors();
-    }
-
-    get playerManager() {
-        return this._playerManager;
-    }
-
-    createSelectors() {
-        const { players } = this.playerManager;
-
-        new PlayerSelector("player1", "player1-preview", players);
-        new PlayerSelector("player2", "player2-preview", players);
-    }
-
-    start() {
-        console.log("Dynedoc Fatality start.");
-        console.log(`${this.playerManager.players.length} characters available.`);
-    }
-}
-
-const displayPlayerNames = () => {
-    const manager = new PlayerManager();
-    const cards = [
-        { key: PLAYER1_STORAGE_KEY, selector: ".player-card--p1 .player-card__name" },
-        { key: PLAYER2_STORAGE_KEY, selector: ".player-card--p2 .player-card__name" }
-    ];
-
-    cards.forEach(({ key, selector }) => {
-        const nameElement = document.querySelector(selector);
-        const player = manager.findPlayer(localStorage.getItem(key));
-
-        if (nameElement && player) {
-            nameElement.textContent = player.name;
-        }
-    });
-};
-
-const startGame = () => {
-    const select1 = document.getElementById("player1");
-    const select2 = document.getElementById("player2");
-
-    if (!select1 || !select2) {
-        console.error("Character selectors not found.");
-        return;
-    }
-
-    if (!select1.value || !select2.value) {
-        alert("Choose a character for each player before starting the game.");
-        return;
-    }
-
-    localStorage.setItem(PLAYER1_STORAGE_KEY, select1.value);
-    localStorage.setItem(PLAYER2_STORAGE_KEY, select2.value);
-
-    window.location.href = "index.html";
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-    new FatalityMenu().start();
-    displayPlayerNames();
-});
