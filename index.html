@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duel — Jeu de plateau tour par tour</title>
+    <meta name="description" content="Duel tour par tour : deux personnages s'affrontent sur une carte générée aléatoirement. Déplacements, armes et combat.">
+    <link rel="icon" href="assets/etoile.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hud">
+    <h1 class="hud__title"><span class="hud__title-accent">.</span>1 V 1<span class="hud__title-accent">.</span></h1>
+    <p class="hud__turn" id="turn-indicator" data-testid="turn-indicator"></p>
+</header>
+<button onclick="window.location.href='fatality.html'" class="menu-item active" data-testid="back-to-menu-button">
+    RETOUR
+</button>
+<main class="arena">
+
+    <!--============Fiche du joueur 1===============-->
+    <section class="player-card player-card--p1" id="card-p1" data-testid="player-card-p1">
+        <h2 class="player-card__name"></h2>
+        <div class="player-card__hp-bar"><div class="player-card__hp-fill"></div></div>
+        <p class="player-card__stat">PV : <span class="hp-value">100</span> / 100</p>
+        <p class="player-card__stat">Arme : <span class="weapon-value">—</span></p>
+        <p class="player-card__stat">Posture : <span class="posture-value">—</span></p>
+    </section>
+
+    <!-- La grille de jeu géré dans le JS -->
+    <div id="map" class="map" data-testid="map-grid"></div>
+
+    <!--============Fiche du joueur 2===============-->
+    <section class="player-card player-card--p2" id="card-p2" data-testid="player-card-p2">
+        <h2 class="player-card__name"></h2>
+        <div class="player-card__hp-bar"><div class="player-card__hp-fill"></div></div>
+        <p class="player-card__stat">PV : <span class="hp-value">100</span> / 100</p>
+        <p class="player-card__stat">Arme : <span class="weapon-value">—</span></p>
+        <p class="player-card__stat">Posture : <span class="posture-value">—</span></p>
+    </section>
+
+</main>
+
+<!--============Journal de combat===============-->
+<section class="log" id="log" data-testid="combat-log" aria-live="polite"></section>
+
+<!--============Actions===============-->
+<div class="combat-actions" id="combat-actions" data-testid="combat-actions">
+    <button id="attack-button" data-testid="attack-button" class="menu-item" disabled>ATTAQUER</button>
+    <button id="posture-button" data-testid="posture-button" class="menu-item" disabled>POSTURE</button>
+    <button id="end-turn-button" data-testid="end-turn-button" class="menu-item" disabled>FIN DE TOUR</button>
+</div>
+
+
+<footer class="controls">
+    <p><kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> se déplacer</p>
+    <p><kbd>P</kbd> changer de posture</p>
+    <p><kbd>A</kbd> attaquer (en combat)</p>
+    <p><kbd>Entrée</kbd> terminer le tour</p>
+</footer>
+
+<!--============Écran de victoire===============-->
+<div id="game-over" class="game-over hidden" data-testid="game-over-overlay">
+    <div class="game-over__panel">
+        <h2 class="game-over__title" id="game-over-title" data-testid="game-over-title"></h2>
+        <p class="game-over__subtitle">FATALITY</p>
+        <button class="menu-item active" onclick="window.location.reload()" data-testid="restart-button">REJOUER</button>
+        <button class="menu-item" onclick="window.location.href='fatality.html'" data-testid="back-to-select-button">MENU</button>
+    </div>
+</div>
+
+<!-- les Scripts -->
+<!--les réglages-->
+<script src="js/config/constants.js"></script>
+<!--les armes-->
+<script src="js/Weapon.js"></script>
+<script src="js/config/Weapons.js"></script>
+<!--les joueurs-->
+<script src="js/Player.js"></script>
+<!--les cellules de la carte-->
+<script src="js/Cell.js"></script>
+<!--la carte-->
+<script src="js/GameMap.js"></script>
+<!--l'affichage -->
+<script src="js/ui/render.js"></script>
+<!--les règles-->
+<script src="js/Game.js"></script>
+<!--le lanceur/demarrage-->
+<script src="js/main.js"></script>
+</body>
+</html>

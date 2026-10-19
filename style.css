@@ -1,0 +1,323 @@
+:root {
+    --bg: #10121a;
+    --bg-panel: #181b26;
+    --line: #2a2e3d;
+    --text: #e7e8ee;
+    --text-dim: #8b8fa3;
+    --p1: #3ed9c8;
+    --p2: #e5588a;
+    --obstacle: #2f3242;
+    --weapon: #f2c14e;
+    --danger: #ff5c5c;
+    --orange: #fb5607;
+    --blue: #0877c9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 1rem 2.5rem;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),url("assets/etoile.png");
+    background-repeat: no-repeat; /* Empêche la répétition de l'image */
+    background-position: center;
+    background-size: cover;
+}
+
+/* ---------- En-tête ---------- */
+.hud { text-align: center; }
+.hud__title {
+    margin: 0;
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+}
+.hud__title-accent { color: var(--weapon); }
+.hud__turn {
+    margin: 0.25rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+}
+
+/* ---------- Zone de jeu ---------- */
+.arena {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.map {
+    display: grid;
+    gap: 2px;
+    background: var(--line);
+    border: 2px solid  #ffd21c;
+    border-radius: 6px;
+    padding: 2px;
+    width: min(1100px, 90vw);
+    height: auto;
+    aspect-ratio: 1 / 1;
+
+}
+
+.cell {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-panel);
+    font-size: 1.1rem;
+    border-radius: 2px;
+    position: relative;
+}
+
+.cell--obstacle { background: var(--obstacle); }
+.cell--weapon { box-shadow: inset 0 0 0 2px var(--weapon); }
+
+.cell--player1 { box-shadow: inset 0 0 0 2px var(--p1); }
+.cell--player2 { box-shadow: inset 0 0 0 2px var(--p2); }
+
+/* ---------- Fiches joueur ---------- */
+.player-card {
+    width: 190px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 1rem;
+}
+.player-card--p1 { border-top: 3px solid var(--p1); }
+.player-card--p2 { border-top: 3px solid var(--p2); }
+
+.player-card__name {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+}
+.player-card--p1 .player-card__name { color: var(--p1); }
+.player-card--p2 .player-card__name { color: var(--p2); }
+
+.player-card__hp-bar {
+    height: 8px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+.player-card__hp-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--danger);
+    transition: width 0.2s ease;
+}
+
+.player-card__stat {
+    margin: 0.2rem 0;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+.player-card__stat span { color: var(--text); }
+
+/* ---------- Journal de combat ---------- */
+.log {
+    width: min(560px, 90vw);
+    max-height: 140px;
+    overflow-y: auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+.log p { margin: 0.15rem 0; }
+.log p:last-child { color: var(--text); }
+
+/* ---------- Contrôles ---------- */
+.controls {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+kbd {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-right: 0.15rem;
+}
+.map__cell {
+    aspect-ratio: 1 / 1;
+    border: 1px solid #333;
+}
+.map__cell--obstacle {
+    background: #444;
+}
+.menu-item{
+    width: 130px;
+}
+.menu-item.active {
+    color: white;
+
+    background:
+            linear-gradient(
+                    90deg,
+                    #351000,
+                    #8f2700,
+                    #351000
+            );
+
+    border: 3px solid var(--orange);
+
+    box-shadow:
+            0 0 0 1px #230000,
+            0 0 15px rgba(251,86,7,.55),
+            inset 0 0 15px rgba(251,86,7,.3);
+
+    height: 42px;
+
+
+    transform: scale(1.04);
+}
+
+
+.menu-item.active::before {
+    content: "▶";
+
+    position: absolute;
+
+    left: 12px;
+
+    color: var(--orange);
+
+    font-size: 13px;
+
+    text-shadow:
+            0 0 8px var(--orange);
+}
+
+
+.menu-item.active::after {
+    content: "◀";
+
+    position: absolute;
+
+    right: 12px;
+
+    color: var(--orange);
+
+    font-size: 13px;
+
+    text-shadow:
+            0 0 8px var(--orange);
+}
+
+
+.menu-item:hover {
+    color: var(--orange);
+
+    background:
+            linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(251,86,7,.3),
+                    transparent
+            );
+}
+.map__cell--personnage {
+    position: relative;
+}
+.map__cell--arme {
+    position: relative;
+}
+
+.map__cell-sprite {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 2px;
+}
+
+/* ---------- Cases de déplacement surlignées ---------- */
+.map__cell--movable {
+    background: rgba(62, 217, 200, 0.25);
+    box-shadow: inset 0 0 0 2px var(--p1);
+    cursor: pointer;
+}
+
+.map__cell--movable:hover {
+    background: rgba(62, 217, 200, 0.5);
+}
+
+/* ---------- Joueur actif ---------- */
+.map__cell--active {
+    box-shadow: inset 0 0 0 3px var(--weapon);
+}
+
+.player-card--active {
+    border-color: var(--weapon);
+    box-shadow: 0 0 14px rgba(242, 193, 78, 0.55);
+}
+
+/* ---------- Actions ---------- */
+.combat-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.combat-actions .menu-item[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- Écran de victoire ---------- */
+.game-over {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(2, 6, 9, 0.82);
+}
+
+.game-over__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    text-align: center;
+    padding: 2.5rem 3rem;
+    background: var(--bg-panel);
+    border: 2px solid var(--weapon);
+    border-radius: 10px;
+}
+
+.game-over__title {
+    margin: 0;
+    font-size: 2.2rem;
+    color: var(--weapon);
+    text-shadow: 0 0 18px rgba(242, 193, 78, 0.6);
+}
+
+.game-over__subtitle {
+    margin: 0;
+    color: var(--text-dim);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
