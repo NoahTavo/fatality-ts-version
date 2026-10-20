@@ -1,9 +1,29 @@
-const getMapContainer = () => document.getElementById("map");
+import { MAX_MOVE, PLAYER_MAX_HP, POSTURE_LABELS } from "../config/constants";
+import type { Game } from "../Game";
+import type { Player } from "../Player";
 
-const findCellElement = (x, y) =>
-    document.querySelector(`.map__cell[data-x="${x}"][data-y="${y}"]`);
+export const getMapContainer = (): HTMLElement => {
+    const container = document.getElementById("map");
 
-const renderGame = (game) => {
+    if (!container) {
+        throw new Error("Conteneur #map introuvable dans la page.");
+    }
+
+    return container;
+};
+
+const findCellElement = (x: number, y: number): HTMLElement | null =>
+    document.querySelector<HTMLElement>(`.map__cell[data-x="${x}"][data-y="${y}"]`);
+
+const setText = (parent: ParentNode, selector: string, text: string): void => {
+    const element = parent.querySelector(selector);
+
+    if (element) {
+        element.textContent = text;
+    }
+};
+
+export const renderGame = (game: Game): void => {
     game.map.render(getMapContainer());
     highlightReachableCells(game);
     highlightActivePlayerCell(game);
@@ -13,7 +33,7 @@ const renderGame = (game) => {
 };
 
 // Surligne les cases où le joueur actif peut se déplacer ce tour.
-const highlightReachableCells = (game) => {
+const highlightReachableCells = (game: Game): void => {
     document.querySelectorAll(".map__cell--movable")
         .forEach(element => element.classList.remove("map__cell--movable"));
 
@@ -29,7 +49,7 @@ const highlightReachableCells = (game) => {
     });
 };
 
-const highlightActivePlayerCell = (game) => {
+const highlightActivePlayerCell = (game: Game): void => {
     document.querySelectorAll(".map__cell--active")
         .forEach(element => element.classList.remove("map__cell--active"));
 
@@ -44,19 +64,23 @@ const highlightActivePlayerCell = (game) => {
     }
 };
 
-// Fiches des joueurs : PV, arme, posture, encadré du joueur actif.
-const updatePlayerCards = (game) => {
-    game.players.forEach((player, index) => {
+// Fiches des joueurs : nom, PV, arme, posture, encadré du joueur actif.
+const updatePlayerCards = (game: Game): void => {
+    game.players.forEach((player: Player, index: number) => {
         const card = document.getElementById(`card-p${index + 1}`);
         if (!card) {
             return;
         }
 
-        card.querySelector(".hp-value").textContent = player.hp;
-        card.querySelector(".player-card__hp-fill").style.width =
-            `${(player.hp / PLAYER_MAX_HP) * 100}%`;
-        card.querySelector(".weapon-value").textContent = player.weapon.name;
-        card.querySelector(".posture-value").textContent = POSTURE_LABELS[player.posture];
+        setText(card, ".player-card__name", player.name);
+        setText(card, ".hp-value", String(player.hp));
+        setText(card, ".weapon-value", player.weapon.name);
+        setText(card, ".posture-value", POSTURE_LABELS[player.posture]);
+
+        const hpFill = card.querySelector<HTMLElement>(".player-card__hp-fill");
+        if (hpFill) {
+            hpFill.style.width = `${(player.hp / PLAYER_MAX_HP) * 100}%`;
+        }
 
         card.classList.toggle(
             "player-card--active",
@@ -65,14 +89,16 @@ const updatePlayerCards = (game) => {
     });
 };
 
-const updateTurnIndicator = (game) => {
+const updateTurnIndicator = (game: Game): void => {
     const indicator = document.getElementById("turn-indicator");
     if (!indicator) {
         return;
     }
 
     if (game.isOver) {
-        indicator.textContent = `Partie terminée : ${game.winner.name} a gagné !`;
+        indicator.textContent = game.winner
+            ? `Partie terminée : ${game.winner.name} a gagné !`
+            : "Partie terminée";
         return;
     }
 
@@ -82,13 +108,17 @@ const updateTurnIndicator = (game) => {
     }
 
     indicator.textContent =
-    `Tour de ${game.currentPlayer.name} — ${game.movesLeft} case(s) restante(s) (1 à ${MAX_MOVE} cases)`;
+        `Tour de ${game.currentPlayer.name} — ${game.movesLeft} case(s) restante(s) (1 à ${MAX_MOVE} cases)`;
 };
 
-const updateCombatActions = (game) => {
-    const attackButton = document.getElementById("attack-button");
-    const postureButton = document.getElementById("posture-button");
-    const endTurnButton = document.getElementById("end-turn-button");
+const getButton = (id: string): HTMLButtonElement | null =>
+    document.getElementById(id) as HTMLButtonElement | null;
+
+const updateCombatActions = (game: Game): void => {
+    const attackButton = getButton("attack-button");
+    const postureButton = getButton("posture-button");
+    const endTurnButton = getButton("end-turn-button");
+
     if (!attackButton || !postureButton) {
         return;
     }
@@ -102,7 +132,7 @@ const updateCombatActions = (game) => {
 };
 
 // Journal de combat / de déplacement.
-const addLog = (message) => {
+export const addLog = (message: string): void => {
     const log = document.getElementById("log");
     if (!log) {
         return;
@@ -115,7 +145,7 @@ const addLog = (message) => {
 };
 
 // Message de victoire.
-const showGameOver = (winner) => {
+export const showGameOver = (winner: Player): void => {
     const overlay = document.getElementById("game-over");
     const title = document.getElementById("game-over-title");
     if (!overlay || !title) {

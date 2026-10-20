@@ -1,5 +1,17 @@
+import { GRID_COLUMNS, GRID_ROWS, MAX_WEAPONS, OBSTACLE_RATE, PLAYER1_STORAGE_KEY, PLAYER2_STORAGE_KEY } from "./config/constants";
+import { Game } from "./Game";
+import { GameMap } from "./GameMap";
+import { PlayerManager } from "./PlayerManager";
+import { getMapContainer } from "./ui/render";
+
+declare global {
+    interface Window {
+        game?: Game;
+    }
+}
+
 // index.html ouvert sans passage par le menu : pose une sélection par défaut.
-const ensureCharactersSelected = () => {
+const ensureCharactersSelected = (): void => {
     const manager = new PlayerManager();
 
     if (manager.selectedPlayers.length < 2) {
@@ -21,8 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Clavier : flèches pour se déplacer, A pour attaquer, P pour la posture,
     // Entrée pour terminer le tour.
-    document.addEventListener("keydown", (event) => {
-        if (Object.keys(Game.KEY_DIRECTIONS).includes(event.key)) {
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+        if (event.key in Game.KEY_DIRECTIONS) {
             event.preventDefault();
         }
 
@@ -30,12 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Boutons d'action (mêmes actions que les touches).
-    document.getElementById("attack-button").addEventListener("click", () => game.attack());
-    document.getElementById("posture-button").addEventListener("click", () => game.togglePosture());
-    document.getElementById("end-turn-button").addEventListener("click", () => game.endTurnManually());
+    document.getElementById("attack-button")?.addEventListener("click", () => game.attack());
+    document.getElementById("posture-button")?.addEventListener("click", () => game.togglePosture());
+    document.getElementById("end-turn-button")?.addEventListener("click", () => game.endTurnManually());
+
     // Clic sur une case surlignée pour s'y déplacer.
-    getMapContainer().addEventListener("click", (event) => {
-        const cellElement = event.target.closest(".map__cell");
+    getMapContainer().addEventListener("click", (event: MouseEvent) => {
+        if (!(event.target instanceof Element)) {
+            return;
+        }
+
+        const cellElement = event.target.closest<HTMLElement>(".map__cell");
         if (!cellElement) {
             return;
         }

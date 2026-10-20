@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Duel — Jeu de plateau tour par tour</title>
     <meta name="description" content="Duel tour par tour : deux personnages s'affrontent sur une carte générée aléatoirement. Déplacements, armes et combat.">
-    <link rel="icon" href="assets/etoile.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="/assets/etoile.png">
+    <link rel="stylesheet" href="/src/styles/game.css">
 </head>
 <body>
 
@@ -70,23 +70,6 @@
     </div>
 </div>
 
-<!-- les Scripts -->
-<!--les réglages-->
-<script src="js/config/constants.js"></script>
-<!--les armes-->
-<script src="js/Weapon.js"></script>
-<script src="js/config/Weapons.js"></script>
-<!--les joueurs-->
-<script src="js/Player.js"></script>
-<!--les cellules de la carte-->
-<script src="js/Cell.js"></script>
-<!--la carte-->
-<script src="js/GameMap.js"></script>
-<!--l'affichage -->
-<script src="js/ui/render.js"></script>
-<!--les règles-->
-<script src="js/Game.js"></script>
-<!--le lanceur/demarrage-->
-<script src="js/main.js"></script>
+<script type="module" src="/src/main.ts"></script>
 </body>
 </html>

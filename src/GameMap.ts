@@ -1,53 +1,65 @@
-class GameMap {
-    constructor(columns, rows, obstacleRate, numberWeapons) {
+import { Cell, type CellContent } from "./Cell";
+import { MAX_GENERATION_ATTEMPTS } from "./config/constants";
+import { WEAPON_TYPES } from "./config/Weapons";
+import type { Player } from "./Player";
+import { PlayerManager } from "./PlayerManager";
+import type { Weapon } from "./Weapon";
+
+export class GameMap {
+    private readonly _columns: number;
+    private readonly _rows: number;
+    private readonly _obstacleRate: number;
+    private readonly _numberWeapons: number;
+    private readonly _grid: Cell[] = [];
+    private _weapons: Weapon[] = []; // armes posées au sol
+    private readonly _players: Player[] = []; // dans l'ordre de placement (joueur 1 d'abord)
+
+    constructor(columns: number, rows: number, obstacleRate: number, numberWeapons: number) {
         this._columns = columns;
         this._rows = rows;
         this._obstacleRate = obstacleRate;
         this._numberWeapons = numberWeapons;
-        this._grid = [];
-        this._weapons = []; // armes posées au sol
-        this._players = []; // dans l'ordre de placement (joueur 1 d'abord)
 
         this.createGrid();
         this.placeWeapons();
         this.placePlayers();
     }
 
-    get columns() {
+    get columns(): number {
         return this._columns;
     }
 
-    get rows() {
+    get rows(): number {
         return this._rows;
     }
 
-    get obstacleRate() {
+    get obstacleRate(): number {
         return this._obstacleRate;
     }
 
-    get numberWeapons() {
+    get numberWeapons(): number {
         return this._numberWeapons;
     }
 
-    get grid() {
+    get grid(): Cell[] {
         return this._grid;
     }
 
-    get weapons() {
+    get weapons(): Weapon[] {
         return this._weapons;
     }
 
-    get players() {
+    get players(): Player[] {
         return this._players;
     }
 
     // ----- Création -----
 
-    generateCellContent() {
+    private generateCellContent(): CellContent {
         return Math.random() < this.obstacleRate ? Cell.OBSTACLE : Cell.EMPTY;
     }
 
-    createGrid() {
+    private createGrid(): void {
         for (let x = 0; x < this.columns; x++) {
             for (let y = 0; y < this.rows; y++) {
                 this.grid.push(new Cell(x, y, this.generateCellContent()));
@@ -57,45 +69,46 @@ class GameMap {
 
     // ----- Accès aux cases -----
 
-    isInsideMap(x, y) {
+    isInsideMap(x: number, y: number): boolean {
         return x >= 0 && x < this.columns && y >= 0 && y < this.rows;
     }
 
-    getCell(x, y) {
+    getCell(x: number, y: number): Cell | null {
         return this.isInsideMap(x, y) ? this.grid[x * this.rows + y] : null;
     }
 
-    getRandomCell() {
+    // Toujours une case valide : les coordonnées tirées sont dans la carte.
+    getRandomCell(): Cell {
         const x = Math.floor(Math.random() * this.columns);
         const y = Math.floor(Math.random() * this.rows);
 
-        return this.getCell(x, y);
+        return this.grid[x * this.rows + y];
     }
 
     // ----- Armes et joueurs posés sur la grille -----
 
-    getWeaponAt(x, y) {
-        return this.weapons.find(weapon => weapon.x === x && weapon.y === y) || null;
+    getWeaponAt(x: number, y: number): Weapon | null {
+        return this.weapons.find(weapon => weapon.x === x && weapon.y === y) ?? null;
     }
 
-    getPlayerAt(x, y) {
-        return this.players.find(player => player.x === x && player.y === y) || null;
+    getPlayerAt(x: number, y: number): Player | null {
+        return this.players.find(player => player.x === x && player.y === y) ?? null;
     }
 
     // Pose une arme au sol (placement initial ou arme déposée par un joueur).
-    addWeapon(weapon, x, y) {
+    addWeapon(weapon: Weapon, x: number, y: number): void {
         weapon.position = { x, y };
         this.weapons.push(weapon);
     }
 
     // Retire une arme du sol (ramassée par un joueur).
-    removeWeapon(weapon) {
+    removeWeapon(weapon: Weapon): void {
         this._weapons = this.weapons.filter(item => item !== weapon);
         weapon.position = { x: null, y: null };
     }
 
     // Case vide, sans arme ni joueur.
-    isCellFree(cell) {
+    isCellFree(cell: Cell): boolean {
         return cell.isEmpty
             && !this.getWeaponAt(cell.x, cell.y)
             && !this.getPlayerAt(cell.x, cell.y);
@@ -103,7 +116,7 @@ class GameMap {
 
     // ----- Placement -----
 
-    placeWeapons() {
+    private placeWeapons(): void {
         WEAPON_TYPES.forEach(weaponType => {
             let isSearchingCell = true;
 
@@ -118,7 +131,7 @@ class GameMap {
         });
     }
 
-    placePlayers() {
+    private placePlayers(): void {
         new PlayerManager().selectedPlayers.forEach(player => {
             const cell = this.findPlayerStartingCell();
 
@@ -132,7 +145,7 @@ class GameMap {
     }
 
     // Case libre, jamais adjacente à un joueur déjà placé.
-    findPlayerStartingCell() {
+    private findPlayerStartingCell(): Cell | null {
         for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt++) {
             const cell = this.getRandomCell();
 
@@ -144,7 +157,7 @@ class GameMap {
         return null;
     }
 
-    isAdjacentToPlayer(cell) {
+    private isAdjacentToPlayer(cell: Cell): boolean {
         return this.players.some(player =>
             Math.abs(player.x - cell.x) + Math.abs(player.y - cell.y) <= 1
         );
@@ -152,11 +165,11 @@ class GameMap {
 
     // ----- Rendu -----
 
-    renderCell(cell) {
+    renderCell(cell: Cell): HTMLDivElement {
         const element = document.createElement("div");
         element.classList.add("map__cell");
-        element.dataset.x = cell.x;
-        element.dataset.y = cell.y;
+        element.dataset.x = String(cell.x);
+        element.dataset.y = String(cell.y);
         element.dataset.testid = `map-cell-${cell.x}-${cell.y}`;
 
         if (cell.isObstacle) {
@@ -183,7 +196,7 @@ class GameMap {
         return element;
     }
 
-    render(container) {
+    render(container: HTMLElement): void {
         container.innerHTML = "";
 
         container.style.display = "grid";
@@ -193,5 +206,3 @@ class GameMap {
         this.grid.forEach(cell => container.appendChild(this.renderCell(cell)));
     }
 }
-
-// La création de la carte est déclenchée par main.js, le rendu par renderGame (ui/render.js).
