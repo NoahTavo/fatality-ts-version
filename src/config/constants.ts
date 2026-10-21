@@ -6,6 +6,7 @@ export const MAX_WEAPONS = 4;               // nombre maximum d'armes posées su
 export const MAX_GENERATION_ATTEMPTS = 100; // sécurité si les joueurs sont emmurés
 
 // ----- Joueurs -----
+export const PLAYERS_COUNT = 2;
 export const PLAYER_MAX_HP = 100;
 export const MAX_MOVE = 3;                    // cases par tour
 export const DEFAULT_WEAPON_DAMAGE = 10;      // arme de départ (poings)
@@ -18,43 +19,44 @@ export const POSTURES = {
 
 export type Posture = (typeof POSTURES)[keyof typeof POSTURES];
 
-export const POSTURE_LABELS: Record<Posture, string> = {
+export const POSTURE_LABELS: Readonly<Record<Posture, string>> = {
     [POSTURES.OFFENSIVE]: "Offensive",
     [POSTURES.DEFENSIVE]: "Défensive"
 };
 
-// ----- États de la partie -----
-export const GAME_STATES = {
+// ----- Phases de la partie (discriminant de l'union GameState) -----
+export const GAME_PHASES = {
     MOVING: "moving",   // phase de déplacement
     COMBAT: "combat",   // les deux joueurs sont adjacents
     OVER: "over"        // un joueur est tombé à 0 PV
 } as const;
 
-export type GameState = (typeof GAME_STATES)[keyof typeof GAME_STATES];
+export type GamePhase = (typeof GAME_PHASES)[keyof typeof GAME_PHASES];
 
-// ----- Directions (flèches du clavier) -----
+// ----- Directions -----
 export type DirectionName = "up" | "down" | "left" | "right";
 
 export interface Direction {
-    dx: number;
-    dy: number;
+    readonly dx: number;
+    readonly dy: number;
 }
 
-export const DIRECTIONS: Record<DirectionName, Direction> = {
+export const DIRECTIONS: Readonly<Record<DirectionName, Direction>> = {
     up:    { dx: -1, dy: 0 },
     down:  { dx: 1,  dy: 0 },
     left:  { dx: 0,  dy: -1 },
     right: { dx: 0,  dy: 1 }
 };
 
-export const DIRECTION_NAMES = Object.keys(DIRECTIONS) as DirectionName[];
+export const DIRECTION_NAMES: readonly DirectionName[] = ["up", "down", "left", "right"];
 
 // ----- Sélection des personnages (localStorage) -----
 export const PLAYER1_STORAGE_KEY = "Dynedoc_player1";
 export const PLAYER2_STORAGE_KEY = "Dynedoc_player2";
 
 // ----- Personnages disponibles (images dans public/assets/characters/) -----
-export const PLAYER_FILES: string[] = [
+// `as const` : le tableau devient un tuple de littéraux, dont on dérive le type PlayerFile.
+export const PLAYER_FILES = [
     "Jules.png",
     "Noah.png",
     "Wissem.png",
@@ -63,4 +65,10 @@ export const PLAYER_FILES: string[] = [
     "Faical.png",
     "Abdel.png",
     "Samuel.png"
-];
+] as const;
+
+export type PlayerFile = (typeof PLAYER_FILES)[number];
+
+// Garde de type : valide une valeur inconnue (ex. lue dans localStorage ou dans un <select>).
+export const isPlayerFile = (value: unknown): value is PlayerFile =>
+    typeof value === "string" && (PLAYER_FILES as readonly string[]).includes(value);

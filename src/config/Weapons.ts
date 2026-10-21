@@ -1,7 +1,7 @@
-import { Weapon } from "../Weapon";
+import { Weapon } from "../models/Weapon";
 import { DEFAULT_WEAPON_DAMAGE } from "./constants";
 
-export const WEAPON_TYPES: Weapon[] = [
+export const WEAPON_TYPES: readonly Weapon[] = [
     new Weapon("sword", "Knife", 15, "assets/weapons/sword.svg"),
     new Weapon("gun", "Gun", 20, "assets/weapons/gun-military.svg"),
     new Weapon("rocket", "Rocket", 50, "assets/weapons/missile.svg"),
