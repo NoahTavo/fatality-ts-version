@@ -1,9 +1,7 @@
 type Listener<Payload> = (payload: Payload) => void;
 
 // Émetteur d'événements générique et fortement typé.
-// `Events` associe chaque nom d'événement au type de sa donnée :
-//   type Events = { log: string; gameOver: Player };
-// => `on("log", msg => ...)` : msg est inféré comme string, un nom inconnu ne compile pas.
+// `Events` associe chaque nom d'événement au type de sa donnée
 export class TypedEventEmitter<Events extends object> {
     private readonly _listeners = new Map<keyof Events, Set<(payload: never) => void>>();
 
