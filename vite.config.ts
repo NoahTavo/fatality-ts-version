@@ -4,6 +4,9 @@ import { resolve } from "path";
 // Application multi-pages : le menu (fatality.html) et le jeu (index.html).
 export default defineConfig({
   base: "./", // chemins relatifs : le build peut être déployé dans un sous-dossier
+  server: {
+    open: "/fatality.html" // `npm run dev` ouvre directement le menu
+  },
   build: {
     rollupOptions: {
       input: {
