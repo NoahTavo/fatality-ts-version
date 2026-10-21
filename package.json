@@ -1,0 +1,26 @@
+{
+  "name": "fatality-ts-version",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  },
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NoahTavo/fatality-ts-version.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NoahTavo/fatality-ts-version/issues"
+  },
+  "homepage": "https://github.com/NoahTavo/fatality-ts-version#readme"
+}
